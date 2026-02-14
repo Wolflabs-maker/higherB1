@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOLFFY Studio | Higher - Second Conditional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wolfGreen: '#1ed760',
+                        wolfGold: '#FFD700',
+                        wolfBlack: '#050505',
+                        wolfDark: '#121212',
+                        wolfBlue: '#3d91f4',
+                        wolfBorder: 'rgba(255, 215, 0, 0.2)',
+                        wolfGlass: 'rgba(255, 255, 255, 0.03)'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body, html { 
+            height: 100%; 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #050505; 
+            color: #ffffff; 
+            font-family: 'Inter', sans-serif; 
+        }
+
+        .view-container { height: 100%; overflow-y: auto; scrollbar-width: none; }
+        .view-container::-webkit-scrollbar { display: none; }
+
+        .glass-card { background: var(--tw-bg-wolfGlass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; }
+        .glass-card-gold { background: rgba(255, 215, 0, 0.05); backdrop-filter: blur(20px); border: 1px solid var(--tw-border-wolfBorder); border-radius: 24px; }
+        .glass-card-blue { background: rgba(61, 145, 244, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(61, 145, 244, 0.3); border-radius: 24px; }
+
+        .nav-item.active { color: #FFD700; background: rgba(255, 215, 0, 0.1); border-left: 4px solid #FFD700; }
+
+        .section-view { display: none; width: 100%; height: 100%; animation: fadeIn 0.4s ease-out forwards; }
+        .section-view.active { display: flex; flex-direction: column; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-execute { background-color: #FFD700; color: #000; font-weight: 900; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; border-radius: 50px; }
+        .btn-execute:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+        
+        .input-wolf { background: rgba(0,0,0,0.6); border: 1px solid #333; outline: none; transition: all 0.3s; border-radius: 12px; text-align: center; font-weight: 800; text-transform: uppercase; color: #FFD700; }
+        .input-wolf:focus { border-color: #FFD700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
+        
+        .formula-tag { background: #000; padding: 4px 12px; border-radius: 6px; border: 1px solid #333; font-family: 'Montserrat'; font-weight: 800; font-size: 0.75rem; color: #666; }
+
+        .footer-fixed { white-space: nowrap; flex-shrink: 0; }
+
+        .conversation-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .conversation-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-black flex flex-col p-6 gap-6 h-full flex-shrink-0 border-r border-gray-900 z-50 hidden md:flex">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-wolfBlue rounded-full flex items-center justify-center text-white">
+                <i class="fa-solid fa-code-branch text-xl"></i>
+            </div>
+            <span class="font-bold text-2xl tracking-tighter font-['Montserrat']">WOLF<span class="text-wolfBlue font-black italic">LABS</span></span>
+        </div>
+
+        <nav class="flex flex-col gap-1 flex-1">
+            <button onclick="showStep(0)" id="nav-0" class="nav-item active flex items-center gap-4 p-3 rounded-lg font-bold text-gray-400 hover:text-white transition-all text-left">
+                <i class="fa-solid fa-bolt w-5"></i> Phase 2 Intro
+            </button>
+            <button onclick="showStep(1)" id="nav-1" class="nav-item flex items-center gap-4 p-3 rounded-lg font-bold text-gray-400 hover:text-white transition-all text-left">
+                <i class="fa-solid fa-microchip w-5"></i> The Syntax
+            </button>
+            <button onclick="showStep(2)" id="nav-2" class="nav-item flex items-center gap-4 p-3 rounded-lg font-bold text-gray-400 hover:text-white transition-all text-left">
+                <i class="fa-solid fa-shield-halved w-5"></i> WERE Protocol
+            </button>
+            <button onclick="showStep(3)" id="nav-3" class="nav-item flex items-center gap-4 p-3 rounded-lg font-bold text-gray-400 hover:text-white transition-all text-left">
+                <i class="fa-solid fa-keyboard w-5 text-wolfGold"></i> Drill Arena
+            </button>
+            <button onclick="showStep(4)" id="nav-4" class="nav-item flex items-center gap-4 p-3 rounded-lg font-bold text-gray-400 hover:text-white transition-all text-left">
+                <i class="fa-solid fa-comments w-5"></i> Conv. Lab
+            </button>
+        </nav>
+        
+        <div class="pt-4 border-t border-gray-900">
+            <div id="progress-status" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Sync: 0%</div>
+            <div class="w-full h-1 bg-gray-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-wolfBlue w-[0%] transition-all duration-700"></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN INTERFACE -->
+    <main class="flex-1 bg-wolfBlack flex flex-col h-full relative overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="h-20 shrink-0 px-8 flex justify-between items-center bg-wolfBlack/90 backdrop-blur-md border-b border-white/5 z-40">
+            <h2 id="step-title" class="font-display font-black text-xl uppercase tracking-widest text-gray-300 italic">Phase 2: Unreal Reality</h2>
+            <div class="flex items-center gap-4">
+                <div class="text-[10px] font-black border border-wolfBlue text-wolfBlue px-3 py-1 rounded-full uppercase">Protocol: Second Conditional</div>
+            </div>
+        </header>
+
+        <!-- VIEWPORT -->
+        <div class="flex-1 relative overflow-hidden">
+            
+            <!-- STEP 0: INTRO -->
+            <section id="view-0" class="section-view active justify-center items-center p-8 text-center">
+                <div class="max-w-3xl">
+                    <h3 class="text-wolfBlue font-black text-xs uppercase tracking-[0.4em] mb-4 italic">Hypothetical Module</h3>
+                    <h1 class="text-6xl md:text-8xl font-display font-black mb-8 leading-tight uppercase">THE UNREAL<br>WORLD</h1>
+                    <p class="text-lg md:text-xl text-gray-400 mb-12 italic">In Phase 2, we leave facts behind. <br>Let's learn to talk about what is <span class="text-white font-bold italic">not real</span>.</p>
+                    <button onclick="showStep(1)" class="btn-execute !bg-wolfBlue !text-white px-12 py-5 text-lg">Initialize Rules</button>
+                </div>
+            </section>
+
+            <!-- STEP 1: THE SYNTAX -->
+            <section id="view-1" class="section-view p-12 justify-center items-center">
+                <div class="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-4xl font-display font-black mb-6 uppercase italic">The <span class="text-wolfBlue">Syntax</span> Card</h2>
+                        <p class="text-gray-400 mb-8 leading-relaxed">To create an alternative reality, we use the <strong class="text-white">Past Simple</strong> in the condition to show distance from the real world.</p>
+                        
+                        <div class="glass-card-blue p-8 border-l-4 border-wolfBlue">
+                            <div class="flex items-center gap-4 mb-4">
+                                <span class="formula-tag uppercase">IF + PAST SIMPLE</span>
+                                <i class="fa-solid fa-arrow-right text-gray-600"></i>
+                                <span class="formula-tag !text-wolfGold uppercase">WOULD + VERB</span>
+                            </div>
+                            <div class="text-2xl font-black text-white italic leading-tight">"If I <span class="text-wolfBlue">went</span> higher, I <span class="text-wolfGold">would see</span> the truth."</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="glass-card p-6 flex flex-col gap-2">
+                            <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Logic Breakdown</span>
+                            <p class="text-sm text-gray-400 italic">The "Past" here doesn't indicate time, but <span class="text-white">IMPROBABILITY</span>.</p>
+                        </div>
+                        <div class="glass-card p-6 border border-white/5 bg-white/5">
+                            <span class="text-xs font-bold text-wolfBlue uppercase mb-2 block tracking-widest">Example Scenario</span>
+                            <div class="text-lg font-medium">If I had wings, I would fly.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 2: THE WERE PROTOCOL -->
+            <section id="view-2" class="section-view p-12 justify-center items-center">
+                <div class="max-w-4xl w-full text-center">
+                    <h2 class="text-5xl font-display font-black mb-8 uppercase tracking-tighter italic">THE <span class="text-wolfGold">WERE</span> PROTOCOL</h2>
+                    <p class="text-gray-400 mb-12 max-w-2xl mx-auto italic">In formal hypothetical situations, the system replaces "WAS" with <strong class="text-wolfGold">WERE</strong> for all subjects. This emphasizes that none of this is real.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                        <div class="glass-card-gold p-8 border-t-2 border-wolfGold">
+                            <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Unreal Identity</div>
+                            <div class="text-4xl font-black text-white italic mb-2 uppercase">IF I <span class="text-wolfGold">WERE</span></div>
+                            <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Standard Conditional Rule</p>
+                        </div>
+                        <div class="glass-card-gold p-8 border-t-2 border-wolfGold">
+                            <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Unreal Third Person</div>
+                            <div class="text-4xl font-black text-white italic mb-2 uppercase">IF SHE <span class="text-wolfGold">WERE</span></div>
+                            <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Standard Conditional Rule</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 bg-black/40 inline-block border-dashed border-gray-700">
+                        <p class="text-gray-400 text-sm italic">"If I <span class="text-wolfGold font-bold">were</span> you, I would take the chance."</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 3: DRILL ARENA -->
+            <section id="view-3" class="section-view p-12 justify-center items-center">
+                <div class="max-w-2xl w-full text-center">
+                    <div class="mb-10">
+                        <span class="text-wolfGold font-mono text-[10px] tracking-[0.4em] uppercase">Security Clearance Check</span>
+                        <h2 class="text-6xl font-display font-black uppercase italic tracking-tighter">Drill Arena</h2>
+                    </div>
+
+                    <div class="glass-card-gold p-12 relative overflow-hidden">
+                        <div id="drill-prompt" class="text-xl font-bold mb-8 text-gray-400 uppercase tracking-widest">If I ______ (be) you, I would go.</div>
+                        <input type="text" id="drill-input" class="input-wolf w-full py-5 text-2xl mb-8" placeholder="Type answer..." autocomplete="off">
+                        <button onclick="checkDrill()" class="btn-execute w-full py-4 !bg-wolfBlue !text-white">Verify Syntax</button>
+                        <div id="drill-feedback" class="mt-6 font-bold h-6"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 4: CONVERSATION LAB -->
+            <section id="view-4" class="section-view p-12 justify-center items-center">
+                <div class="max-w-5xl w-full">
+                    <div class="text-center mb-10">
+                        <h2 class="text-5xl font-display font-black uppercase italic tracking-tighter">CONVERSATION <span class="text-wolfGreen">LAB</span></h2>
+                        <p class="text-gray-400 mt-2 italic">Apply the rules in real-time scenarios. What would you do?</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass-card p-8 conversation-card">
+                            <i class="fa-solid fa-earth-americas text-wolfBlue text-3xl mb-4"></i>
+                            <h3 class="font-black text-sm uppercase tracking-widest mb-4 text-white">The Explorer</h3>
+                            <p class="text-xs text-gray-500 leading-relaxed italic">"If you could travel anywhere in the world right now, where would you go?"</p>
+                        </div>
+                        <div class="glass-card p-8 conversation-card">
+                            <i class="fa-solid fa-crown text-wolfGold text-3xl mb-4"></i>
+                            <h3 class="font-black text-sm uppercase tracking-widest mb-4 text-white">The President</h3>
+                            <p class="text-xs text-gray-500 leading-relaxed italic">"If you were the President of your country, what would you change first?"</p>
+                        </div>
+                        <div class="glass-card p-8 conversation-card">
+                            <i class="fa-solid fa-bolt text-wolfGreen text-3xl mb-4"></i>
+                            <h3 class="font-black text-sm uppercase tracking-widest mb-4 text-white">The Hero</h3>
+                            <p class="text-xs text-gray-500 leading-relaxed italic">"If you had a superpower, which one would you choose to have?"</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 flex flex-col items-center gap-6">
+                        <div class="glass-card-blue p-6 text-center border-dashed w-full max-w-2xl">
+                            <p class="text-sm font-bold text-wolfBlue uppercase tracking-[0.2em] mb-2">Simulation Prompt</p>
+                            <p class="text-white italic text-lg">"If I <span class="text-wolfBlue">won</span> the lottery, I <span class="text-wolfGold">would</span>..."</p>
+                        </div>
+                        <button onclick="showStep(5)" class="btn-execute px-10 py-4 !bg-wolfGreen !text-black">Complete Mission</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 5: SUCCESS -->
+            <section id="view-5" class="section-view justify-center items-center text-center p-8">
+                 <div class="w-32 h-32 bg-wolfBlue rounded-full flex items-center justify-center text-white text-6xl mb-10 shadow-[0_0_50px_rgba(61,145,244,0.3)] animate-pulse">
+                    <i class="fa-solid fa-code-merge"></i>
+                 </div>
+                 <h1 class="text-7xl font-display font-black mb-6 uppercase tracking-tighter italic leading-none">Hypothesis<br>Synced</h1>
+                 <p class="text-2xl text-gray-500 mb-12 max-w-2xl leading-relaxed italic">You have mastered the art of creating parallel worlds. <br><span class="text-white font-bold">If you were a master, you would be proud.</span></p>
+                 <button onclick="location.reload()" class="btn-execute px-12 py-5 !bg-wolfBlue !text-white">Reboot Lesson</button>
+            </section>
+
+        </div>
+
+        <!-- FOOTER PLAYER -->
+        <footer class="h-24 bg-wolfBlack border-t border-gray-900 flex items-center px-10 gap-12 shrink-0">
+            <div class="flex items-center gap-4 min-w-[240px] footer-fixed">
+                <div class="w-12 h-12 bg-wolfBlue rounded flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-music text-2xl"></i>
+                </div>
+                <div>
+                    <div class="text-sm font-black text-white">Higher (Conditional Mix)</div>
+                    <div class="text-[10px] text-gray-500 uppercase font-black tracking-widest">WOLF OS // B1 MODULE</div>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col items-center">
+                 <div class="flex items-center gap-8 text-gray-500 mb-2">
+                    <i class="fa-solid fa-backward-step cursor-pointer hover:text-white"></i>
+                    <i class="fa-solid fa-circle-play text-4xl cursor-pointer text-white hover:scale-110 transition-transform"></i>
+                    <i class="fa-solid fa-forward-step cursor-pointer hover:text-white"></i>
+                 </div>
+                 <div class="w-full max-w-md h-1 bg-gray-800 rounded-full">
+                    <div id="player-progress" class="h-full bg-wolfBlue w-[45%] rounded-full shadow-[0_0_10px_rgba(61,145,244,0.5)]"></div>
+                 </div>
+            </div>
+            <div class="w-48 flex justify-end items-center gap-6 footer-fixed">
+                <i class="fa-solid fa-volume-high text-gray-500"></i>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        const drills = [
+            { q: "If I ______ (be) you, I would go.", a: "WERE" },
+            { q: "If she ______ (be) here, she would help.", a: "WERE" },
+            { q: "If it ______ (be) easy, everyone would do it.", a: "WERE" },
+            { q: "If I ______ (have) money, I would buy it.", a: "HAD" },
+            { q: "If they ______ (know), they would tell us.", a: "KNEW" },
+            { q: "If I ______ (be) the President, I'd change the law.", a: "WERE" }
+        ];
+
+        let drillIdx = 0;
+        let currentStep = 0;
+
+        function showStep(step) {
+            document.querySelectorAll('.section-view').forEach(v => v.classList.remove('active'));
+            const targetView = document.getElementById(`view-${step}`);
+            if (targetView) targetView.classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            const nav = document.getElementById(`nav-${step > 4 ? 4 : step}`);
+            if(nav) nav.classList.add('active');
+
+            const perc = (step / 5) * 100;
+            document.getElementById('progress-bar').style.width = `${perc}%`;
+            document.getElementById('progress-status').innerText = `Sync: ${Math.round(perc)}%`;
+            document.getElementById('player-progress').style.width = `${10 + (step * 18)}%`;
+            
+            currentStep = step;
+        }
+
+        function checkDrill() {
+            const input = document.getElementById('drill-input').value.toUpperCase().trim();
+            const feedback = document.getElementById('drill-feedback');
+            const target = drills[drillIdx].a;
+
+            if (input === target) {
+                feedback.innerHTML = '<span class="text-wolfBlue">✓ PATTERN RECOGNIZED</span>';
+                setTimeout(() => {
+                    drillIdx++;
+                    if (drillIdx < drills.length) {
+                        document.getElementById('drill-prompt').innerText = drills[drillIdx].q;
+                        document.getElementById('drill-input').value = "";
+                        feedback.innerText = "";
+                    } else {
+                        // Success leads to Conversation now
+                        showStep(4);
+                    }
+                }, 800);
+            } else {
+                feedback.innerHTML = '<span class="text-red-500 uppercase text-xs tracking-widest font-black">✗ PROTOCOL ERROR. EXPECTED: ' + target + '</span>';
+            }
+        }
+
+        document.getElementById('drill-input')?.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') checkDrill();
+        });
+    </script>
+</body>
+</html>
